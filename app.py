@@ -1,19 +1,19 @@
-from flask import Flask, Response, stream_with_context
+from flask import Flask, Response
 import requests
 import os
 
 app = Flask(__name__)
-SOURCE_URL = os.environ.get("NGROK_URL")
 
-@app.route("/stream.mp3")
-def proxy_stream():
+NGROK_URL = os.getenv("NGROK_URL")
+
+@app.route('/')
+def stream():
     def generate():
-        with requests.get(SOURCE_URL, stream=True) as r:
-            for chunk in r.iter_content(chunk_size=4096):
+        with requests.get(NGROK_URL, stream=True) as r:
+            for chunk in r.iter_content(chunk_size=1024):
                 if chunk:
                     yield chunk
-    return Response(stream_with_context(generate()), mimetype="audio/mpeg")
+    return Response(generate(), mimetype='audio/mpeg')
 
-@app.route("/")
-def index():
-    return "<h1>Stream is running</h1>"
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=10000)
