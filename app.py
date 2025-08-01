@@ -4,16 +4,15 @@ import os
 
 app = Flask(__name__)
 
-NGROK_URL = os.getenv("NGROK_URL")
-
 @app.route('/')
 def stream():
-    def generate():
-        with requests.get(NGROK_URL, stream=True) as r:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk:
-                    yield chunk
-    return Response(generate(), mimetype='audio/mpeg')
+    url = os.environ.get("STREAM_URL", "https://a42ee3cb9fb5.ngrok-free.app/stream.mp3")
+    headers = {
+        'ngrok-skip-browser-warning': '1'
+    }
+    r = requests.get(url, headers=headers, stream=True)
+    return Response(r.iter_content(chunk_size=1024), content_type=r.headers['Content-Type'])
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
