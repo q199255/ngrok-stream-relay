@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-NGROK_URL = os.getenv("https://a42ee3cb9fb5.ngrok-free.app/stream.mp3")
+NGROK_URL = os.getenv("NGROK_URL")
 
 @app.route('/')
 def stream():
